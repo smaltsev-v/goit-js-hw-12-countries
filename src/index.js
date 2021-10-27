@@ -1,3 +1,4 @@
+
 import './sass/main.scss';
 import countriesAll from './templates/countries.hbs';
 import country from './templates/country.hbs';
@@ -37,23 +38,37 @@ function appendCountries(e) {
   refs.countriesContainer.insertAdjacentHTML('beforeend', createCountries(e));
 }
 
+function deleteAlertContainer() {
+  const alertContainersRefs = document.getElementsByClassName('pnotify');
+  if (alertContainersRefs.length) {
+    alertContainersRefs[0].remove();
+  }
+}
+
 function onSearch(e) {
-  fetchF.queary = e.target.value;
+  const query = e.target.value;
+  
+  if (!query) return deleteAlertContainer()
+
+  fetchF.queary = query;
 
   clearCountriesContainer();
 
   fetchF.fetchCountries().then(countries => {
-    console.log(countries);
+    if (!countries.length) return alert({ text: 'No results found' });
+
     if (countries.length > 10) {
       return alert({
         text: 'Too many marches found. Please enter a more specific query',
       });
     }
 
+    deleteAlertContainer();
+
     if (countries.length >= 2 && countries.length <= 10) {
-      console.log(countries);
       return appendCountries(countries);
     }
+
     if (countries.length <= 1) {
       appendCountry(countries);
     }
